@@ -1,12 +1,7 @@
 import { Router, Request, Response } from "express";
-// import {
-//   listImages,
-//   getImagePath,
-//   thumbnailExists
-// } from '../../utilities/fsOperations';
-// import { resizeImage } from '../../utilities/sharp';
-// import { generateFileName, trimExtension } from '../../utilities/helpers';
 import { resize } from "./resize";
+const _ = require("lodash");
+
 const imagesRouter: Router = Router();
 
 interface QueryObj {
@@ -16,22 +11,22 @@ interface QueryObj {
 }
 
 imagesRouter.get("/images", async (req: Request, res: Response) => {
-  const width = parseInt(req.query.width as string);
-  const height = parseInt(req.query.height as string);
-  const filename = req.query.filename as string | undefined;
+  const width: number = parseInt(req.query.width as string);
+  const height: number = parseInt(req.query.height as string);
+  const filename: string = req.query.filename as string;
 
-  if (!filename) {
-    res.status(400).send("you are missing the photo name");
+  if (_.isNil(filename)) {
+    res.status(400).send("Missing photo name");
     return;
   }
 
-  if (!width || width === 0 || width < 0) {
-    res.status(400).send("please type a valid width");
+  if (!_.isNumber(width)) {
+    res.status(400).send("Wrong width value");
     return;
   }
 
-  if (!height || height === 0 || height < 0) {
-    res.status(400).send("please type a valid height");
+  if (!_.isNumber(height)) {
+    res.status(400).send("Wrong height value");
     return;
   }
 
@@ -39,7 +34,7 @@ imagesRouter.get("/images", async (req: Request, res: Response) => {
     const outputThumb = await resize(width, height, filename);
     res.sendFile(outputThumb);
   } catch (error) {
-    res.status(404).send("required image not found");
+    res.status(404).send("Image not found");
   }
 });
 
