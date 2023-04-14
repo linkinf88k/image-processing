@@ -3,21 +3,25 @@ import {
   Request,
   Response,
   ErrorRequestHandler,
-  NextFunction,
-} from "express";
-import imagesRouter from "./images";
-
+  NextFunction
+} from 'express';
+import imagesRouter from './images';
+import handleCaching from './middleware/cache';
 const router: Router = Router();
 
-router.get("/", (req: Request, res: Response): void => {
-  res.render("index");
-});
-// Images Router
-router.use("/api", imagesRouter);
-//404 Page not found
-router.use((req: Request, res: Response): void =>
-  res.status(404).render("404")
+router.get(
+  '/',
+  (req: Request, res: Response): void => {
+    res.render('index');
+  },
+  handleCaching
 );
+
+router.use('/api', imagesRouter);
+
+// router.use((req: Request, res: Response): void =>
+//   res.status(404).render('404')
+// );
 // 500 Server Errors Handlers
 router.use(
   (
@@ -28,7 +32,7 @@ router.use(
     _next: NextFunction
   ) => {
     console.log(error);
-    res.status(500).render("500");
+    res.status(404).render('404');
   }
 );
 
